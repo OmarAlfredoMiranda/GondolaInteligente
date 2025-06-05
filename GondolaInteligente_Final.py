@@ -32,10 +32,10 @@ while True:
    # Capturar un frame de video
    ret, frame = camera.read()
    frame = cv2.resize(frame, (224, 224), interpolation=cv2.INTER_AREA)
-   frame = np.asarray(frame, dtype=np.float32).reshape(1, 224, 224, 3)
+   input_frame = np.asarray(frame, dtype=np.float32).reshape(1, 224, 224, 3)
 
    # Usar el modelo para detectar objetos en el frame
-   detections = model.predict(frame)
+   detections = model.predict(input_frame)
    #np.expand_dims(frame, axis=0)
 
    # Imprimir la etiqueta con mayor probabilidad en lugar del índice de la etiqueta
@@ -51,12 +51,15 @@ while True:
 
            # Dibujar un recuadro alrededor del objeto detectado
            cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
-  
+
            # Recortar la imagen de la botella
            bottle_image = frame[y1:y2, x1:x2]
 
            # Normalizar la imagen de la botella
            bottle_image = (bottle_image / 127.5) - 1
+
+           # Valor inicial para detectar cambios en el frame
+           change_detected = False
 
            # Comparar la imagen de la botella con el frame anterior para ver si ha sido agregada o retirada
            if prev_frame is not None:
